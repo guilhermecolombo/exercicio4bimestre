@@ -47,6 +47,7 @@
 							$("input[name='nome']").val(vetor.nome);
 							$("input[name='email']").val(vetor.email);
 							$("input[name='salario']").val(vetor.salario);
+							$("select[name='nome_cidade']").val(vetor.nome_cidade);
 							if(vetor.sexo=='F'){
 								$("input[name='sexo'][value='M']").attr("checked",false);
 								$("input[name='sexo'][value='F']").attr("checked",true);
@@ -71,9 +72,10 @@
 							for(i=0;i<matriz.length;i++){
 								linha = "<tr>";
 								linha += "<td class='nome'>" + matriz[i].nome + "</td>";
-								linha += "<td>" + matriz[i].email + "</td>";
-								linha += "<td>" + matriz[i].sexo + "</td>";
-								linha += "<td>" + matriz[i].salario + "</td>";
+								linha += "<td class='email'>" + matriz[i].email + "</td>";
+								linha += "<td class='sexo'>" + matriz[i].sexo + "</td>";
+								linha += "<td class='salario'>" + matriz[i].salario + "</td>";
+								linha += "<td class='nome_cidade'>" + matriz[i].nome_cidade + "</td>";
 								linha += "<td><button type = 'button' class = 'alterar' value ='" + matriz[i].id_cadastro + "'>Alterar</button> | <button type = 'button' class ='remover' value ='" + matriz[i].id_cadastro + "'>Remover</button></td>";
 								linha += "</tr>";
 								$("#identificador").append(linha);
@@ -96,7 +98,8 @@
 								nome:$("input[name='nome']").val(), 
 								email:$("input[name='email']").val(), 
 								salario:$("input[name='salario']").val(), 
-								sexo:$("input[name='sexo']:checked").val()
+								sexo:$("input[name='sexo']:checked").val(),
+								nome_cidade:$("select[name='nome_cidade']:checked").val()
 							},
 						success: function(data){
 							if(data==1){
@@ -124,6 +127,7 @@
 								$("input[name='sexo'][value='M']").attr("checked",false)
 								$("input[name='sexo'][value='F']").attr("checked",false)
 								$("input[name='salario']").val("");
+								$("select[name='nome_cidade']").val("");
 								$(".alteracao").attr("class","cadastrar");
 								$(".cadastrar").val("Cadastrar");
 							}else {
@@ -137,8 +141,7 @@
 					td = $(this);
 					nome = td.html();
 					td.html("<input type='text' id='nome_alterar' name='nome' value='" + nome + "' />");
-					td.attr("class","nome_alterar");
-					
+					td.attr("class","nome_alterar");	
 				});
 				
 				$(document).on("blur",".nome_alterar",function(){
@@ -157,6 +160,99 @@
 							nome = $("#nome_alterar").val();
 							td.html(nome);
 							td.attr("class","nome");
+						}
+					});
+				});
+				
+				$(document).on("click",".email",function(){
+					td = $(this);
+					email = td.html();
+					td.html("<input type='text' id='email_alterar' name='email' value='" + email + "' />");
+					td.attr("class","email_alterar");	
+				});
+				
+				$(document).on("blur",".email_alterar",function(){
+					id_linha = $(this).closest("tr").find("button").val();
+					
+					$.ajax({
+						url:"alterar_coluna.php",
+						type:"post",
+						data:{
+							coluna:'email',
+							valor:$("#email_alterar").val(),
+							id: id_linha
+							},
+						success: function(){
+							td = $(".email_alterar");
+							email = $("#email_alterar").val();
+							td.html(email);
+							td.attr("class","email");
+						}
+					});
+				});
+				$(document).on("click",".sexo",function(){
+					td = $(this);
+					sexo = td.html();
+					input_sexo = "<input type='radio' class='alterar_sexo' name='sexo' value='M' /> M ";
+					input_sexo += "<input type='radio' class='alterar_sexo' name='sexo' value='F' /> F ";
+					
+					td.html(input_sexo);
+					
+					if(sexo=="M"){
+						$(".alterar_sexo[value='M']").prop("checked",true);
+						$(".alterar_sexo[value='F']").prop("checked",false);
+					}
+					else{
+						$(".alterar_sexo[value='M']").prop("checked",false);
+						$(".alterar_sexo[value='F']").prop("checked",true);
+					}
+
+					td.attr("class","sexo_alterar");	
+				});
+				
+				$(document).on("blur",".sexo_alterar",function(){
+					id_linha = $(this).closest("tr").find("button").val();
+					
+					$.ajax({
+						url:"alterar_coluna.php",
+						type:"post",
+						data:{
+							coluna:'sexo',
+							valor:$(".alterar_sexo:checked").val(),
+							id: id_linha
+							},
+						success: function(r){
+							console.log(r);
+							td = $(".sexo_alterar");
+							sexo = $(".alterar_sexo:checked").val();
+							td.html(sexo);
+							td.attr("class","sexo");
+						}
+					});
+				});
+				$(document).on("click",".salario",function(){
+					td = $(this);
+					salario = td.html();
+					td.html("<input type='text' id='salario_alterar' name='salario' value='" + salario + "' />");
+					td.attr("class","salario_alterar");	
+				});
+				
+				$(document).on("blur",".salario_alterar",function(){
+					id_linha = $(this).closest("tr").find("button").val();
+					
+					$.ajax({
+						url:"alterar_coluna.php",
+						type:"post",
+						data:{
+							coluna:'salario',
+							valor:$("#salario_alterar").val(),
+							id: id_linha
+							},
+						success: function(){
+							td = $(".salario_alterar");
+							salario = $("#salario_alterar").val();
+							td.html(salario);
+							td.attr("class","salario");
 						}
 					});
 				});
@@ -223,6 +319,7 @@
 					<th>E-mail</th>
 					<th>Sexo</th>
 					<th>Salario</th>
+					<th>Codigo Cidade</th>
 					<th>Acao</th>
 				</tr>
 			 </thead>
